@@ -96,7 +96,7 @@ object ShuntingYard {
 
       val token = tokens.charAt(i)
 
-      // If it a digit
+      // If it is a digit
       if (token.isDigit) {
 
         val num = tokens.substring(i, getNumber(i, tokens))
@@ -123,6 +123,9 @@ object ShuntingYard {
         while (stack.top != "(") {
           output.enqueue(stack.pop())
         }
+        if (stack.top == "(") {
+          stack.pop()
+        }
       }
     }
 
@@ -136,9 +139,10 @@ object ShuntingYard {
   // ===================== \\
 
   def main(args: Array[String]): Unit = {
-    // Should be 23+45+*
-    val str = "(2*3) + (4+5)"
+    // Should be 4 4 2 * 1 5 - / +
+    val str = "4+4 * 2 / (1-5)"
 
-    print(infixToPostfix(refine(str)))
+    println(refine(str))
+    println(infixToPostfix(refine(str)))
   }
 }
