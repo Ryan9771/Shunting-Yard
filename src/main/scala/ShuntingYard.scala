@@ -90,59 +90,124 @@ object ShuntingYard {
    */
   private def infixToPostfix(tokens: String): m.Queue[String] = {
     val output = m.Queue[String]()
-    val stack = m.Stack[String]()
 
-    for (i <- 0 until tokens.length) {
+    try {
+      val stack = m.Stack[String]()
 
-      val token = tokens.charAt(i)
+      for (i <- 0 until tokens.length) {
 
-      // If it is a digit
-      if (token.isDigit) {
+        val token = tokens.charAt(i)
 
-        val num = tokens.substring(i, getNumber(i, tokens))
-        output.enqueue(num)
+        // If it is a digit
+        if (token.isDigit) {
 
-      } else if (isOperator(token)) {
+          val num = tokens.substring(i, getNumber(i, tokens))
+          output.enqueue(num)
 
-        // It is an operator
-        while (
-          (stack.nonEmpty && isOperator(stack.top.charAt(0))) &&
-            (
-              (checkAssoc(token, "left") && getPrec(token) <= getPrec(stack.top.charAt(0))) ||
-                (checkAssoc(token, "right") && getPrec(token) < getPrec(stack.top.charAt(0)))
+        } else if (isOperator(token)) {
 
-              )) {
+          // It is an operator
+          while (
+            (stack.nonEmpty && isOperator(stack.top.charAt(0))) &&
+              (
+                (checkAssoc(token, "left") && getPrec(token) <= getPrec(stack.top.charAt(0))) ||
+                  (checkAssoc(token, "right") && getPrec(token) < getPrec(stack.top.charAt(0)))
 
-          val op = stack.pop()
-          output.enqueue(op)
-        }
-        stack.push(token.toString)
-      } else if (token == '(') {
-        stack.push(token.toString)
-      } else if (token == ')') {
-        while (stack.top != "(") {
-          output.enqueue(stack.pop())
-        }
-        if (stack.top == "(") {
-          stack.pop()
+                )) {
+
+            val op = stack.pop()
+            output.enqueue(op)
+          }
+          stack.push(token.toString)
+        } else if (token == '(') {
+          stack.push(token.toString)
+        } else if (token == ')') {
+          while (stack.top != "(") {
+            output.enqueue(stack.pop())
+          }
+          if (stack.top == "(") {
+            stack.pop()
+          } else {
+            throw new UnsupportedOperationException("Incorrect equation form")
+          }
+        } else {
+          throw new UnsupportedOperationException("Incorrect equation form")
         }
       }
-    }
 
-    while (stack.nonEmpty) {
-      output.enqueue(stack.pop())
+      while (stack.nonEmpty) {
+        output.enqueue(stack.pop())
+      }
+
+    } catch {
+      case e => println("Exception: Incorrect syntax")
     }
 
     output
+  }
+
+  /**
+   * Returns true if str is a number.
+   */
+  private def isNumber(str: String): Boolean = {
+    try {
+      str.toInt
+      true
+    } catch {
+      case e => false
+    }
+  }
+
+  /**
+   * Evaluates an operator along with its arguments.
+   */
+  private def performOperation(i: Int, j: Int, str: String): Int = {
+    str match {
+      case "+" => i + j
+      case "-" => j - i
+      case "*" => i * j
+      case "^" => scala.math.pow(j, i).toInt
+      case "/" => j / i
+      case _ => throw new UnsupportedOperationException("Unsupported Syntax")
+    }
+  }
+
+
+  /**
+   * Evaluates the postfix queue.
+   */
+  private def postFixToValue(queue: m.Queue[String]): Int = {
+    val stack = m.Stack[Int]()
+    while (queue.nonEmpty) {
+      val token = queue.dequeue()
+
+      if (isNumber(token)) {
+        stack.push(token.toInt)
+      } else {
+        // It is an operator
+        val x1 = stack.pop()
+        val x2 = stack.pop()
+
+        stack.push(performOperation(x1, x2, token))
+      }
+    }
+
+    stack.pop()
+  }
+
+  private def shuntingYard(str: String): Int = {
+
+    postFixToValue(infixToPostfix(refine(str)))
   }
 
   // ===================== \\
 
   def main(args: Array[String]): Unit = {
     // Should be 4 4 2 * 1 5 - / +
-    val str = "4+4 * 2 / (1-5)"
+    val str = "4 + 4 * 2 / ( 1 - 5 )"
 
     println(refine(str))
     println(infixToPostfix(refine(str)))
+    println(shuntingYard(str))
   }
 }
