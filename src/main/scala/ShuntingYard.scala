@@ -64,6 +64,7 @@ object ShuntingYard {
     "/" -> (5, "left"),
     "*" -> (5, "left"),
     "^" -> (10, "right"),
+    "m" -> (11, "right")
   )
 
   /**
@@ -185,9 +186,13 @@ object ShuntingYard {
       } else {
         // It is an operator
         val x1 = stack.pop()
-        val x2 = stack.pop()
 
-        stack.push(performOperation(x1, x2, token))
+        if (token == "m") {
+          stack.push(-1 * x1)
+        } else {
+          val x2 = stack.pop()
+          stack.push(performOperation(x1, x2, token))
+        }
       }
     }
 
@@ -206,7 +211,8 @@ object ShuntingYard {
 
   def main(args: Array[String]): Unit = {
     // Should be 4 4 2 * 1 5 - / +
-    val str = "4 + 4 * 2 / ( 1 - 5 )"
+//    val str = "4 + 4 * 2 / ( 1 - 5 )"
+    val str = "5 * (-3) + 2"
 
     println("")
     println(s"Refined Expression: ${refine(str)}")
