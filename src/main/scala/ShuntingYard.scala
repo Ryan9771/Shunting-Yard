@@ -42,7 +42,7 @@ object ShuntingYard {
   /**
    * Retrives the index where the the number ends
    */
-  def getNumber(start: Int, str: String): Int = {
+  private def getNumber(start: Int, str: String): Int = {
     var curr = start
 
     breakable {
@@ -57,7 +57,8 @@ object ShuntingYard {
     curr
   }
 
-  val rules: Map[String, (Int, String)] = Map.apply(
+  // Set of rules to indicate precedence and associativity
+  private val rules: Map[String, (Int, String)] = Map.apply(
     "+" -> (0, "left"),
     "-" -> (0, "left"),
     "/" -> (5, "left"),
@@ -65,20 +66,29 @@ object ShuntingYard {
     "^" -> (10, "right"),
   )
 
-  def getPrec(c: Char): Int = {
+  /**
+   * Returns the precedence of an operator
+   */
+  private def getPrec(c: Char): Int = {
     val (p, _) = rules.getOrElse(c.toString, (0, ""))
 
     p
   }
 
-  def checkAssoc(c: Char, asoc: String): Boolean = {
+  /**
+   * Checks if an operator is of given associativity
+   */
+  private def checkAssoc(c: Char, asoc: String): Boolean = {
     val (_, a) = rules.getOrElse(c.toString, (0, ""))
 
     a.equals(asoc)
   }
 
 
-  def infixToPostfix(tokens: String): m.Queue[String] = {
+  /**
+   * The Shunting Yard algorithm that converts infix operators to prefix
+   */
+  private def infixToPostfix(tokens: String): m.Queue[String] = {
     val output = m.Queue[String]()
     val stack = m.Stack[String]()
 
@@ -126,7 +136,8 @@ object ShuntingYard {
   // ===================== \\
 
   def main(args: Array[String]): Unit = {
-    val str = "1+1 - 1 * 3"
+    // Should be 23+45+*
+    val str = "(2*3) + (4+5)"
 
     print(infixToPostfix(refine(str)))
   }
