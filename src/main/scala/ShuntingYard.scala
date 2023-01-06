@@ -172,7 +172,6 @@ object ShuntingYard {
     }
   }
 
-
   /**
    * Evaluates the postfix queue.
    */
@@ -195,6 +194,9 @@ object ShuntingYard {
     stack.pop()
   }
 
+  /**
+   * Overall method that evaluates the raw string.
+   */
   private def shuntingYard(str: String): Int = {
 
     postFixToValue(infixToPostfix(refine(str)))
@@ -206,8 +208,9 @@ object ShuntingYard {
     // Should be 4 4 2 * 1 5 - / +
     val str = "4 + 4 * 2 / ( 1 - 5 )"
 
-    println(refine(str))
-    println(infixToPostfix(refine(str)))
-    println(shuntingYard(str))
+    println("")
+    println(s"Refined Expression: ${refine(str)}")
+    println(s"Postfix Expression: ${infixToPostfix(refine(str)).mkString("")}")
+    println(s"Evaluated Expression: ${shuntingYard(str)}")
   }
 }
