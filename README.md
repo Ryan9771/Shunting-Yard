@@ -6,3 +6,4 @@ in a compiler project I am taking on soon.
 
 ### Supports
 Supports unary operators such as `-3`, along with the standard operators.
+Supports integered expressions, and expressions returning **integers**.

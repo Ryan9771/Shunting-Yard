@@ -17,6 +17,7 @@ object ShuntingYard {
    * Given a string, it refines it by removing whitespace and replacing unary minus operator with 'm'
    */
   private def refine(str: String): String = {
+    // Removes whitespace
     val newStr = str.replace(" ", "")
     val res = new StringBuilder
 
@@ -40,7 +41,7 @@ object ShuntingYard {
   }
 
   /**
-   * Retrives the index where the the number ends
+   * Retrieves the index where the the number ends to allow for multidigit numbers.
    */
   private def getNumber(start: Int, str: String): Int = {
     var curr = start
@@ -90,6 +91,7 @@ object ShuntingYard {
    * The Shunting Yard algorithm that converts infix operators to prefix
    */
   private def infixToPostfix(tokens: String): m.Queue[String] = {
+    // Follows the algorithm exactly from https://aquarchitect.github.io/swift-algorithm-club/Shunting%20Yard/
     val output = m.Queue[String]()
 
     try {
@@ -102,6 +104,7 @@ object ShuntingYard {
         // If it is a digit
         if (token.isDigit) {
 
+          // Retrieves the multidigit number
           val num = tokens.substring(i, getNumber(i, tokens))
           output.enqueue(num)
 
@@ -210,10 +213,13 @@ object ShuntingYard {
   // ===================== \\
 
   def main(args: Array[String]): Unit = {
-    // Should be 4 4 2 * 1 5 - / +
-//    val str = "4 + 4 * 2 / ( 1 - 5 )"
-    val str = "5 * (-3) + 2"
 
+    /* Some Tests */
+    assert(shuntingYard("4 +4 *2/(1-5)") == 2)
+    assert(shuntingYard("1^-1") == 1)
+    assert(shuntingYard("-3+3") == 0)
+
+    val str = "1^-1"
     println("")
     println(s"Refined Expression: ${refine(str)}")
     println(s"Postfix Expression: ${infixToPostfix(refine(str)).mkString("")}")
